@@ -2,3 +2,4 @@
 *.png filter=lfs diff=lfs merge=lfs binary
 *.ckpt filter=lfs diff=lfs merge=lfs binary
 *.pt filter=lfs diff=lfs merge=lfs binary
+*.zip filter=lfs diff=lfs merge=lfs binary
