@@ -5,7 +5,7 @@ import json
 import csv
 from pathlib import Path
 
-ROOT_PATH: Path = Path(__file__).parent.absolute() / "src" / "pytorch_faster_rcnn_tutorial" / "data" / "lisav1"
+ROOT_PATH: Path = Path(__file__).parent.absolute() / "data" / "lisav1"
 
 categories = {}
 

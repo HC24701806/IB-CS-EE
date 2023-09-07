@@ -58,9 +58,9 @@ class NeptuneSettings(BaseSettings):
     """
 
     api_key: str = Field(default=..., env="NEPTUNE")
-    OWNER: str = "kun.cong"  # set your name here, e.g. johndoe22
+    OWNER: str = "haolin.cong"  # set your name here, e.g. johndoe22
     PROJECT: str = "FasterRCNN"  # set your project name here, e.g. Heads
-    EXPERIMENT: str = "heads"  # set your experiment name here, e.g. heads
+    EXPERIMENT: str = "traffic"  # set your experiment name here, e.g. heads
 
     class Config:
         # this tells pydantic to read the variables from the .env file
@@ -113,24 +113,14 @@ def train():
 
     # data path relative to this file (pathlib)
     train_path: pathlib.Path = (
-        ROOT_PATH / "src" / "pytorch_faster_rcnn_tutorial" / "data" / "lisav1" / "train" / "images"
+        ROOT_PATH / "data" / "lisav1" / "train" / "images"
     )
     valid_path: pathlib.Path = (
-        ROOT_PATH / "src" / "pytorch_faster_rcnn_tutorial" / "data" / "lisav1" / "valid" / "images"
+        ROOT_PATH / "data" / "lisav1" / "valid" / "images"
     )
     test_path: pathlib.Path = (
-        ROOT_PATH / "src" / "pytorch_faster_rcnn_tutorial" / "data" / "lisav1" / "test" / "images"
+        ROOT_PATH / "data" / "lisav1" / "test" / "images"
     )
-
-    """ 
-    # input and target files
-    inputs: List[pathlib.Path] = get_filenames_of_path(data_path / "input")
-    targets: List[pathlib.Path] = get_filenames_of_path(data_path / "target")
-
-    # sort inputs and targets
-    inputs.sort()
-    targets.sort()
-    """
 
     # training transformations and augmentations
     transforms_training: ComposeDouble = ComposeDouble(
@@ -166,16 +156,6 @@ def train():
 
     # random seed (function that sets seed for pseudo-random number generators in: pytorch, numpy, python.random)
     seed_everything(parameters.SEED)
-
-    """
-    # training validation test split (manually)
-    inputs_train, inputs_valid, inputs_test = inputs[:12], inputs[12:16], inputs[16:]
-    targets_train, targets_valid, targets_test = (
-        targets[:12],
-        targets[12:16],
-        targets[16:],
-    )
-    """
 
     # dataset training
     dataset_train: ObjectDetectionDataSet = CreateMLDataset(

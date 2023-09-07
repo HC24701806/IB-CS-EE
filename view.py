@@ -35,7 +35,7 @@ logging.basicConfig(
 # root directory (project directory)
 ROOT_PATH: pathlib.Path = pathlib.Path(__file__).parent.absolute()
 train_path: pathlib.Path = (
-    ROOT_PATH / "src" / "pytorch_faster_rcnn_tutorial" / "data" / "lisav1" / "train" / "images"
+    ROOT_PATH / "data" / "lisav1" / "train" / "images"
 )
 
 # mapping

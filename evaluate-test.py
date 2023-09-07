@@ -32,8 +32,9 @@ from pytorch_faster_rcnn_tutorial.utils import (
 ROOT_PATH: Path = Path(__file__).parent.absolute()
 
 # Change this to the path of the model checkpoint you want to evaluate
-model_path: Path = Path(ROOT_PATH) / "src/pytorch_faster_rcnn_tutorial/models/fasterrcnn_mobilenet_v3_large_fpn.ckpt"
-test_path: Path = ROOT_PATH / "src" / "pytorch_faster_rcnn_tutorial" / "data" / "lisav1" / "test" / "images"
+model_path: Path = Path(ROOT_PATH) / "models/fasterrcnn_mobilenet_v3_large_fpn.ckpt"
+test_path: Path = ROOT_PATH / "data" / "lisav1" / "test" / "images"
+output_pathname: Path = ROOT_PATH / "output" / "lisa_mobilev3_results.json"
 
 # mapping
 mapping: Dict[str, int] = {
@@ -148,7 +149,7 @@ with torch.no_grad():
                 'score': float(score)
             })
 
-with open('lisa_mobilev3_results.json', 'w', encoding='utf-8') as f:
+with open(output_pathname, 'w', encoding='utf-8') as f:
     json.dump(coco_results, f, indent=4)
 
 print(f"Average inference time: {float(total_time) / count / 1e6} ms\n\n")
