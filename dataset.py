@@ -5,8 +5,7 @@ from torch.utils.data import Dataset
 from skimage.color import rgba2rgb
 from skimage.io import imread
 from typing import Dict
-from pytorch_faster_rcnn_tutorial.transformations import ComposeDouble
-from pytorch_faster_rcnn_tutorial.utils import map_class_to_int
+from pytorch_faster_rcnn_tutorial.transformations import ComposeDouble,map_class_to_int
 
 class CreateMLDataset(Dataset):
     def __init__(

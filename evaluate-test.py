@@ -1,6 +1,7 @@
 
 from collections import OrderedDict
 import json
+import os
 import re
 import time
 from typing import Dict, List, Optional, Tuple
@@ -9,8 +10,9 @@ from pathlib import Path
 import torch
 from torch.utils.data import DataLoader
 
-from torchvision.models.detection.faster_rcnn import FasterRCNN, fasterrcnn_mobilenet_v3_large_fpn
-from pytorch_faster_rcnn_tutorial.datasets import CreateMLDataset, ObjectDetectionDataSet
+from torchvision.models.detection.faster_rcnn import FasterRCNN, fasterrcnn_mobilenet_v3_large_fpn, fasterrcnn_resnet50_fpn
+from torch.utils.data import Dataset
+from dataset import CreateMLDataset
 from pytorch_faster_rcnn_tutorial.transformations import ComposeDouble
 from pytorch_faster_rcnn_tutorial.transformations import (
     AlbumentationWrapper,
@@ -27,9 +29,10 @@ from pytorch_faster_rcnn_tutorial.utils import (
 ROOT_PATH: Path = Path(__file__).parent.absolute()
 
 # Change this to the path of the model checkpoint you want to evaluate
-model_path: Path = Path(ROOT_PATH) / "models/fasterrcnn_mobilenet_v3_large_fpn.ckpt"
+model_path: Path = Path(ROOT_PATH) / "models/fasterrcnn_resnet50_fpn.ckpt"
 test_path: Path = ROOT_PATH / "data" / "lisav1" / "test" / "images"
-output_pathname: Path = ROOT_PATH / "output" / "lisa_mobilev3_results.json"
+output_pathname: Path = ROOT_PATH / "output" / "lisa_resnet50_results.json"
+os.makedirs(output_pathname.parent, exist_ok=True)
 
 # mapping
 mapping: Dict[str, int] = {
@@ -92,7 +95,7 @@ transforms_test: ComposeDouble = ComposeDouble(
 )
 
 # dataset test
-dataset_test: ObjectDetectionDataSet = CreateMLDataset(
+dataset_test: Dataset = CreateMLDataset(
     inputPath=test_path,
     transform=transforms_test,
     convert_to_format=None,
@@ -109,7 +112,8 @@ dataloader_test: DataLoader = DataLoader(
 )
 
 # model
-model: FasterRCNN = fasterrcnn_mobilenet_v3_large_fpn(pretrained=False, num_classes=len(mapping) + 1)
+# model: FasterRCNN = fasterrcnn_mobilenet_v3_large_fpn(pretrained=False, num_classes=len(mapping) + 1)
+model: FasterRCNN = fasterrcnn_resnet50_fpn(pretrained=False, num_classes=len(mapping) + 1)
 checkpoint = torch.load(model_path, map_location=torch.device('cpu'))
 # remove the model. prefix in saved checkpoint
 state_dict = OrderedDict([(re.sub('^model\\.', '', k), v) for k, v in checkpoint['state_dict'].items()])

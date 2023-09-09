@@ -1,16 +1,24 @@
 from ultralytics import YOLO
 from pathlib import Path
 import os
+from pydantic import BaseSettings, Field
 
-# read NEPTUNE_API_TOKEN from .env text file
-# and save it as environment variable
-with open('.env') as f:
-    for line in f:
-        line = line.strip()
-        if not line or line.startswith('#'):
-            continue
-        key, value = line.split('=')
-        os.environ[key] = value
+class NeptuneSettings(BaseSettings):
+    """
+    Reads the variables from the environment.
+    Errors will be raised if the required variables are not set.
+    """
+
+    api_key: str = Field(default=..., env="NEPTUNE")
+    PROJECT: str = "haolin.cong/TrafficSign-Yolo"
+    EXPERIMENT: str = "traffic"
+
+    class Config:
+        # this tells pydantic to read the variables from the .env file
+        env_file = ".env"
+
+neptune_settings = NeptuneSettings()
+os.environ["NE"] = neptune_settings.api_key
 
 # Neptune.ai logger is enabled in YOLO by default as long as the key is set in ENV
 
@@ -18,5 +26,5 @@ dataset = Path(__file__).parent / 'data' / 'lisav1' / 'lisa.yaml'
 model = YOLO('yolov8s.pt')
 
 # Train the model
-results = model.train(data=dataset, epochs=150, project='haolin.cong/TrafficSign-Yolo', name='lisav1')
+results = model.train(data=dataset, epochs=150, project=neptune_settings.PROJECT, name='lisav1')
 
