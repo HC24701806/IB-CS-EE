@@ -151,16 +151,6 @@ def get_faster_rcnn_resnet(
         **kwargs,
     )
 
-def get_fasterrcnn_mobilenet_v3_large_fpn(num_classes: int):
-    model = fasterrcnn_mobilenet_v3_large_fpn(
-        # FasterRCNN_MobileNet_V3_Large_FPN_Weights.DEFAULT,
-        num_classes=num_classes,
-    )
-    model.num_classes = num_classes
-    model.image_mean = [0.485, 0.456, 0.406]
-    model.image_std = [0.229, 0.224, 0.225]
-    return model
-
 class FasterRCNNLightning(pl.LightningModule):
     def __init__(
         self, model: torch.nn.Module, lr: float = 0.0001, iou_threshold: float = 0.5

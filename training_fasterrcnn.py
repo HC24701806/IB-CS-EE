@@ -4,6 +4,8 @@ import sys
 from dataclasses import asdict, dataclass, field
 from typing import Dict, List, Optional, Tuple
 
+from torch.utils.data import Dataset
+
 import albumentations
 import numpy as np
 from pydantic import BaseSettings, Field
@@ -15,15 +17,13 @@ from pytorch_lightning.callbacks import (
 )
 from pytorch_lightning.loggers.neptune import NeptuneLogger
 from torch.utils.data import DataLoader
-from torchvision.models.detection.faster_rcnn import FasterRCNN
+from torchvision.models.detection.faster_rcnn import FasterRCNN, fasterrcnn_mobilenet_v3_large_fpn, fasterrcnn_resnet50_fpn_v2
+from torchvision.models import ResNet50_Weights
 
-from pytorch_faster_rcnn_tutorial.backbone_resnet import ResNetBackbones
-from pytorch_faster_rcnn_tutorial.datasets import ObjectDetectionDataSet, CreateMLDataset
 from pytorch_faster_rcnn_tutorial.faster_RCNN import (
     FasterRCNNLightning,
-    get_faster_rcnn_resnet,
-    get_fasterrcnn_mobilenet_v3_large_fpn,
 )
+
 from pytorch_faster_rcnn_tutorial.transformations import (
     AlbumentationWrapper,
     Clip,
@@ -31,11 +31,8 @@ from pytorch_faster_rcnn_tutorial.transformations import (
     FunctionWrapperDouble,
     normalize_01,
 )
-from pytorch_faster_rcnn_tutorial.utils import (
-    collate_double,
-    get_filenames_of_path,
-    log_model_neptune,
-)
+from pytorch_faster_rcnn_tutorial.utils import collate_double
+from .dataset import CreateMLDataset
 
 logger: logging.Logger = logging.getLogger(__name__)
 
@@ -88,7 +85,6 @@ class Parameters:
     SEED: int = 42
     MAXEPOCHS: int = 150
     PATIENCE: int = 50
-    BACKBONE: ResNetBackbones = ResNetBackbones.RESNET34
     FPN: bool = False
     ANCHOR_SIZE: Tuple[Tuple[int, ...], ...] = ((32, 64, 128, 256, 512),)
     ASPECT_RATIOS: Tuple[Tuple[float, ...]] = ((0.5, 1.0, 2.0),)
@@ -103,6 +99,26 @@ class Parameters:
         if self.SAVE_DIR is None:
             self.SAVE_DIR: str = str(pathlib.Path.cwd())
 
+def get_fasterrcnn_mobilenet_v3_large_fpn(num_classes: int) -> FasterRCNN:
+    model = fasterrcnn_mobilenet_v3_large_fpn(
+        num_classes=num_classes,
+    )
+
+    # these are not necessary however used in the tutorial code
+    model.num_classes = num_classes
+    model.image_mean = [0.485, 0.456, 0.406]
+    model.image_std = [0.229, 0.224, 0.225]
+    return model
+
+def get_fasterrcnn_resnet50_fpn_default(num_classes: int) -> FasterRCNN:
+    model = fasterrcnn_resnet50_fpn_v2(
+        num_classes=num_classes,
+        weight_backbone=ResNet50_Weights.IMAGENET1K_V2,
+    )
+    model.num_classes = num_classes
+    model.image_mean = [0.485, 0.456, 0.406]
+    model.image_std = [0.229, 0.224, 0.225]
+    return model
 
 def train():
     # environment variables (pydantic BaseSettings class)
@@ -158,7 +174,7 @@ def train():
     seed_everything(parameters.SEED)
 
     # dataset training
-    dataset_train: ObjectDetectionDataSet = CreateMLDataset(
+    dataset_train: Dataset = CreateMLDataset(
         inputPath=train_path,
         transform=transforms_training,
         convert_to_format=None,
@@ -166,7 +182,7 @@ def train():
     )
 
     # dataset validation
-    dataset_valid: ObjectDetectionDataSet = CreateMLDataset(
+    dataset_valid: Dataset = CreateMLDataset(
         inputPath=valid_path,
         transform=transforms_validation,
         convert_to_format=None,
@@ -174,7 +190,7 @@ def train():
     )
 
     # dataset test
-    dataset_test: ObjectDetectionDataSet = CreateMLDataset(
+    dataset_test: Dataset = CreateMLDataset(
         inputPath=test_path,
         transform=transforms_test,
         convert_to_format=None,
@@ -220,17 +236,6 @@ def train():
     neptune_logger.log_hyperparams(asdict(parameters))
 
     # model init
-    """
-    model: FasterRCNN = get_faster_rcnn_resnet(
-        num_classes=parameters.CLASSES,
-        backbone_name=parameters.BACKBONE,
-        anchor_size=parameters.ANCHOR_SIZE,
-        aspect_ratios=parameters.ASPECT_RATIOS,
-        fpn=parameters.FPN,
-        min_size=parameters.MIN_SIZE,
-        max_size=parameters.MAX_SIZE,
-    )
-    """
     model: FasterRCNN = get_fasterrcnn_mobilenet_v3_large_fpn(parameters.CLASSES)
 
     # lightning model
@@ -275,16 +280,6 @@ def train():
     if not parameters.FAST_DEV_RUN:
         # start testing
         trainer.test(ckpt_path="best", dataloaders=dataloader_test)
-
-        # log model
-        if parameters.LOG_MODEL:
-            checkpoint_path = pathlib.Path(checkpoint_callback.best_model_path)
-            log_model_neptune(
-                checkpoint_path=checkpoint_path,
-                save_directory=pathlib.Path.home(),
-                name="best_model.pt",
-                neptune_logger=neptune_logger,
-            )
 
     # stop logger
     neptune_logger.experiment.stop()

@@ -11,11 +11,6 @@ from torch.utils.data import DataLoader
 
 from torchvision.models.detection.faster_rcnn import FasterRCNN, fasterrcnn_mobilenet_v3_large_fpn
 from pytorch_faster_rcnn_tutorial.datasets import CreateMLDataset, ObjectDetectionDataSet
-from pytorch_faster_rcnn_tutorial.faster_RCNN import (
-    FasterRCNNLightning,
-    get_faster_rcnn_resnet,
-    get_fasterrcnn_mobilenet_v3_large_fpn,
-)
 from pytorch_faster_rcnn_tutorial.transformations import ComposeDouble
 from pytorch_faster_rcnn_tutorial.transformations import (
     AlbumentationWrapper,
