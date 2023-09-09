@@ -1,6 +1,12 @@
 # IB CS EE
 This is the code for my IB CS EE paper. In this paper I am comparing Faster RCNN and Yolo v8 in traffic sign detection task.
 
+## Set Up
+1. Install required packaged
+    ```pip install -r requirements.txt```
+2. Configure Neptune logger <br>
+   Training code uses Neptune logger. The API token needs to be put into .env file in the root folder.
+
 ## Data Set
 https://universe.roboflow.com/dakota-smith/lisa-road-signs
 
