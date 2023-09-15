@@ -1,0 +1,9 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+authors:
+- family-names: "Cong"
+  given-names: "Haolin"
+title: "Comparing Faster RCNN and Yolo v8 in Traffic Sign Detection"
+version: 1.0.0
+date-released: 2023-09-10
+url: "https://github.com/HC24701806/IB-CS-EE"
