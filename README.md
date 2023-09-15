@@ -44,3 +44,15 @@ I use the pycocotools to calculate mAP metrics.
 - evaluate-test.py: to run inference of faster RCNN and generate result json for COCO API.
 - train_yolo.py: to train yolo.
 - train_fasterrcnn.py: to train faster RCNN.
+
+## Cite this work
+```
+@software{Cong_Comparing_Faster_RCNN_2023,
+author = {Cong, Haolin},
+month = sep,
+title = {{Comparing Faster RCNN and Yolo v8 in Traffic Sign Detection}},
+url = {https://github.com/HC24701806/IB-CS-EE},
+version = {1.0.0},
+year = {2023}
+}
+```
