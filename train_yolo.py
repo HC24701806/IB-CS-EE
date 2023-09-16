@@ -1,24 +1,22 @@
 from ultralytics import YOLO
 from pathlib import Path
 import os
-from pydantic import BaseSettings, Field
 
-class NeptuneSettings(BaseSettings):
+class NeptuneSettings():
     """
-    Reads the variables from the environment.
+    Reads the variables from .env file.
     Errors will be raised if the required variables are not set.
     """
-
-    api_key: str = Field(default=..., env="NEPTUNE")
     PROJECT: str = "haolin.cong/TrafficSign-Yolo"
-    EXPERIMENT: str = "traffic"
-
-    class Config:
-        # this tells pydantic to read the variables from the .env file
-        env_file = ".env"
+    def __init__(self):
+        with open(Path(__file__).parent / '.env', 'r') as f:
+            for line in f.readlines():
+                key, value = line.strip().split('=', maxsplit=1)
+                if key == 'NEPTUNE_API_TOKEN':
+                    self.api_key = value
 
 neptune_settings = NeptuneSettings()
-os.environ["NE"] = neptune_settings.api_key
+os.environ["NEPTUNE_API_TOKEN"] = neptune_settings.api_key
 
 # Neptune.ai logger is enabled in YOLO by default as long as the key is set in ENV
 

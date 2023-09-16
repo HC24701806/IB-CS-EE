@@ -55,5 +55,3 @@ plt.xlabel("Recall")
 plt.ylabel("Precision")
 plt.legend(loc="center right")
 plt.show()
-
-plt.figure()

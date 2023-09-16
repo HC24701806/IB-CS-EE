@@ -8,7 +8,6 @@ from torch.utils.data import Dataset
 
 import albumentations
 import numpy as np
-from pydantic import BaseSettings, Field
 from pytorch_lightning import Trainer, seed_everything
 from pytorch_lightning.callbacks import (
     EarlyStopping,
@@ -32,7 +31,8 @@ from pytorch_faster_rcnn_tutorial.transformations import (
     normalize_01,
 )
 from pytorch_faster_rcnn_tutorial.utils import collate_double
-from .dataset import CreateMLDataset
+from dataset import CreateMLDataset
+from lisaset import LisaSet
 
 logger: logging.Logger = logging.getLogger(__name__)
 
@@ -48,23 +48,22 @@ logging.basicConfig(
 ROOT_PATH: pathlib.Path = pathlib.Path(__file__).parent.absolute()
 
 
-class NeptuneSettings(BaseSettings):
+class NeptuneSettings():
     """
-    Reads the variables from the environment.
+    Reads the variables from .env file.
     Errors will be raised if the required variables are not set.
     """
-
-    api_key: str = Field(default=..., env="NEPTUNE")
-    OWNER: str = "haolin.cong"  # set your name here, e.g. johndoe22
-    PROJECT: str = "FasterRCNN"  # set your project name here, e.g. Heads
-    EXPERIMENT: str = "traffic"  # set your experiment name here, e.g. heads
-
-    class Config:
-        # this tells pydantic to read the variables from the .env file
-        env_file = ".env"
+    PROJECT: str = "haolin.cong/TrafficSign-Yolo"
+    def __init__(self):
+        with open(pathlib.Path(__file__).parent / '.env', 'r') as f:
+            for line in f.readlines():
+                key, value = line.strip().split('=', maxsplit=1)
+                if key == 'NEPTUNE_API_TOKEN':
+                    self.api_key = value
 
 # mapping
-mapping: Dict[str, int] = {'signalAhead': 1, 'speedLimit25': 2, 'pedestrianCrossing': 3, 'school': 4, 'noLeftTurn': 5, 'slow': 6, 'yield': 7, 'laneEnds': 8, 'turnRight': 9, 'speedLimit35': 10, 'schoolSpeedLimit25': 11, 'rightLaneMustTurn': 12, 'addedLane': 13, 'keepRight': 14, 'rampSpeedAdvisory50': 15, 'stop': 16, 'speedLimit40': 17, 'merge': 18, 'stopAhead': 19, 'speedLimitUrdbl': 20, 'speedLimit45': 21, 'speedLimit55': 22, 'noRightTurn': 23, 'speedLimit30': 24, 'yieldAhead': 25, 'speedLimit50': 26, 'roundabout': 27, 'truckSpeedLimit55': 28, 'curveRight': 29, 'speedLimit65': 30, 'dip': 31, 'turnLeft': 32, 'rampSpeedAdvisory20': 33, 'curveLeft': 34, 'thruTrafficMergeLeft': 35, 'rampSpeedAdvisory45': 36, 'zoneAhead25': 37, 'doNotEnter': 38, 'rampSpeedAdvisory40': 39, 'speedLimit15': 40, 'zoneAhead45': 41, 'thruMergeRight': 42, 'doNotPass': 43, 'rampSpeedAdvisoryUrdbl': 44, 'rampSpeedAdvisory35': 45, 'thruMergeLeft': 46, 'intersection': 47}
+mapping: Dict[str, int] = LisaSet.get_labels()
+mapping.update((k, v + 1) for k, v in mapping.items()) # add background class
 
 @dataclass
 class Parameters:
@@ -227,8 +226,8 @@ def train():
     # neptune logger (neptune-client)
     neptune_logger: NeptuneLogger = NeptuneLogger(
         api_key=neptune_settings.api_key,
-        project=f"{neptune_settings.OWNER}/{neptune_settings.PROJECT}",  # use your neptune name here
-        name=neptune_settings.PROJECT,
+        project=f"{neptune_settings.PROJECT}",  # use your neptune name here
+        name="Faster RCNN",
         log_model_checkpoints=False,
     )
 
