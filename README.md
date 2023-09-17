@@ -1,5 +1,5 @@
 # IB CS EE
-This is the code for my IB CS EE paper. In this paper I am comparing Faster RCNN and Yolo v8 in traffic sign detection task.
+Code for my IB Extended Essay. In this paper I am comparing the accuracy and speed of Faster R-CNN and Yolov8 in traffic sign detection.
 
 ## Set Up
 1. Install required packaged
@@ -10,16 +10,16 @@ This is the code for my IB CS EE paper. In this paper I am comparing Faster RCNN
 ## Data Set
 https://universe.roboflow.com/dakota-smith/lisa-road-signs
 
-I downloaded the [CreateML JSON format](https://roboflow.com/formats/createml-json). 
+Downloaded the [CreateML JSON format](https://roboflow.com/formats/createml-json). 
 
-For Faster RCNN I wrote a custom dataset to read from it. 
+Faster R-CNN: Wrote a custom dataset to read from it. 
 
-For Yolo I have a script to convert it into [Yolo format](https://docs.ultralytics.com/datasets/detect/).
+YOLO: Script to convert data into [Yolo format](https://docs.ultralytics.com/datasets/detect/).
 
 ## Faster RCNN and Training code
-The training code is based on [the code](https://github.com/johschmidt42/PyTorch-Object-Detection-Faster-RCNN-Tutorial) from [Johannes Schmidt's "Train your own object detector with Faster-RCNN & PyTorch"](https://johschmidt42.medium.com/train-your-own-object-detector-with-faster-rcnn-pytorch-8d3c759cfc70).
+Based on [the code](https://github.com/johschmidt42/PyTorch-Object-Detection-Faster-RCNN-Tutorial) from [Johannes Schmidt's "Train your own object detector with Faster-RCNN & PyTorch"](https://johschmidt42.medium.com/train-your-own-object-detector-with-faster-rcnn-pytorch-8d3c759cfc70).
 
-But I used the pre-implemented models in torchvision instead. There are two models used:
+However, I used the pre-implemented models in Torchvision instead. There are two models used:
 - fasterrcnn_mobilenet_v3_large_fpn
 - fasterrcnn_resnet50_fpn_v2
 
@@ -37,13 +37,13 @@ To evaluate:
 prediction.json could be used in evaluation of mAP metrics.
 
 ## Metrics
-I use the pycocotools to calculate mAP metrics.
+Used the pycocotools to calculate mAP metrics
 
 ## Files
 - generate_coco_gt.py: to generate ground truth of lisa dataset to for COCO API.
-- evaluate-test.py: to run inference of faster RCNN and generate result json for COCO API.
-- train_yolo.py: to train yolo.
-- train_fasterrcnn.py: to train faster RCNN.
+- evaluate-test.py: to run inference of Faster R-CNN and generate result json for COCO API.
+- train_yolo.py: to train Yolo.
+- train_fasterrcnn.py: to train Faster R-CNN.
 
 ## Cite this work
 ```
