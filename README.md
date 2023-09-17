@@ -1,4 +1,4 @@
-# IB CS EE
+# IB Extended Essay Code Repository
 Code for my IB Extended Essay. In this paper I am comparing the accuracy and speed of Faster R-CNN and Yolov8 in traffic sign detection.
 
 ## Set Up
